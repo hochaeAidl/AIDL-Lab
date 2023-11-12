@@ -1,20 +1,12 @@
+
 <!DOCTYPE html>
 <html>
-    <head>
-        {%metas%}
-        <title>{%title%}</title>
-        {%favicon%}
-        {%css%}
-    </head>
-    <body>
-        <!--[if IE]><script>
-        alert("Dash v2.7+ does not support Internet Explorer. Please use a newer browser.");
-        </script><![endif]-->
-        {%app_entry%}
-        <footer>
-            {%config%}
-            {%scripts%}
-            {%renderer%}
-        </footer>
-    </body>
+<head>
+    <title>My Dash App</title>
+    <!-- Additional head elements like CSS -->
+</head>
+<body>
+    Div([H1('Sigmoid Function Visualization'), Label('Value for w'), Slider(min=0, max=5, value=1, id='w-slider'), Label('Value for b'), Slider(min=-5, max=5, value=0, id='b-slider'), Graph(id='sigmoid-graph')])
+    <!-- Additional body elements like JavaScript -->
+</body>
 </html>
