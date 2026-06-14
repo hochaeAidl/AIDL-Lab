@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정호채 소장 - AI & On-Device AI 실전 전문가</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js (for interaction and state management) -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Font Awesome (Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                            navy: '#0b132b',
+                            dark: '#1c2541'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+        .tech-grid-bg {
+            background-image: radial-gradient(rgba(14, 165, 233, 0.15) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body x-data="{ darkMode: true, activeTab: 'all', mobileMenu: false, showContactModal: false, showToast: false, toastMsg: '' }" 
+      :class="darkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'" 
+      class="font-sans antialiased transition-colors duration-300">
+
+    <!-- Floating Glassmorphism Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-md"
+            :class="darkMode ? 'bg-slate-950/80 border-b border-slate-800' : 'bg-white/80 border-b border-slate-200'">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="#" class="flex items-center space-x-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-microchip text-lg"></i>
+                </div>
+                <div>
+                    <span class="text-lg font-bold tracking-tight block leading-none" :class="darkMode ? 'text-white' : 'text-slate-900'">정호채</span>
+                    <span class="text-xs font-medium tracking-widest text-brand-500 uppercase">AIDL Lab</span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#about" class="text-sm font-medium hover:text-brand-500 transition-colors">소개</a>
+                <a href="#strengths" class="text-sm font-medium hover:text-brand-500 transition-colors">핵심 강점</a>
+                <a href="#fields" class="text-sm font-medium hover:text-brand-500 transition-colors">강의 분야</a>
+                <a href="#projects" class="text-sm font-medium hover:text-brand-500 transition-colors">프로젝트 실무</a>
+                <a href="#collaboration" class="text-sm font-medium hover:text-brand-500 transition-colors">협업 제안</a>
+                <a href="#reviews" class="text-sm font-medium hover:text-brand-500 transition-colors">수강후기</a>
+            </nav>
+
+            <!-- Actions -->
+            <div class="hidden md:flex items-center space-x-4">
+                <!-- Theme toggle -->
+                <button @click="darkMode = !darkMode" class="p-2.5 rounded-lg transition-colors border"
+                        :class="darkMode ? 'border-slate-800 hover:bg-slate-900 text-yellow-400' : 'border-slate-200 hover:bg-slate-100 text-slate-700'">
+                    <i :class="darkMode ? 'fa-solid fa-sun' : 'fa-solid fa-moon'"></i>
+                </button>
+                <button @click="showContactModal = true" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-500 to-indigo-600 text-white font-medium hover:opacity-90 transition-opacity shadow-lg shadow-brand-500/10">
+                    강의 의뢰하기
+                </button>
+            </div>
+
+            <!-- Mobile menu button -->
+            <div class="flex items-center space-x-2 md:hidden">
+                <button @click="darkMode = !darkMode" class="p-2 rounded-lg transition-colors border"
+                        :class="darkMode ? 'border-slate-800 hover:bg-slate-900 text-yellow-400' : 'border-slate-200 hover:bg-slate-100 text-slate-700'">
+                    <i :class="darkMode ? 'fa-solid fa-sun' : 'fa-solid fa-moon'"></i>
+                </button>
+                <button @click="mobileMenu = !mobileMenu" class="p-2 rounded-lg transition-colors border"
+                        :class="darkMode ? 'border-slate-800 hover:bg-slate-900' : 'border-slate-200 hover:bg-slate-100'">
+                    <i class="fa-solid text-xl" :class="mobileMenu ? 'fa-xmark' : 'fa-bars'"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer -->
+        <div x-show="mobileMenu" x-cloak class="md:hidden border-t"
+             :class="darkMode ? 'bg-slate-950 border-slate-850' : 'bg-white border-slate-200'">
+            <div class="px-4 pt-2 pb-6 space-y-3">
+                <a href="#about" @click="mobileMenu = false" class="block py-2 px-3 rounded-lg hover:bg-brand-500/10 transition-colors">소개</a>
+                <a href="#strengths" @click="mobileMenu = false" class="block py-2 px-3 rounded-lg hover:bg-brand-500/10 transition-colors">핵심 강점</a>
+                <a href="#fields" @click="mobileMenu = false" class="block py-2 px-3 rounded-lg hover:bg-brand-500/10 transition-colors">강의 분야</a>
+                <a href="#projects" @click="mobileMenu = false" class="block py-2 px-3 rounded-lg hover:bg-brand-500/10 transition-colors">프로젝트 실무</a>
+                <a href="#collaboration" @click="mobileMenu = false" class="block py-2 px-3 rounded-lg hover:bg-brand-500/10 transition-colors">협업 제안</a>
+                <a href="#reviews" @click="mobileMenu = false" class="block py-2 px-3 rounded-lg hover:bg-brand-500/10 transition-colors">수강후기</a>
+                <button @click="showContactModal = true; mobileMenu = false" class="w-full text-center py-3 rounded-xl bg-gradient-to-r from-brand-500 to-indigo-600 text-white font-medium shadow-lg">
+                    강의 의뢰하기
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="about" class="relative pt-32 pb-24 overflow-hidden tech-grid-bg">
+        <!-- Floating Ambient Glows (Dark Mode Only) -->
+        <div x-show="darkMode" class="absolute top-1/4 left-1/4 -translate-x-1/2 w-96 h-96 rounded-full bg-brand-500/10 blur-[100px] pointer-events-none"></div>
+        <div x-show="darkMode" class="absolute bottom-1/4 right-1/4 translate-x-1/2 w-96 h-96 rounded-full bg-indigo-500/10 blur-[100px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Hero Left: Text Credentials -->
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <h2 class="text-xs font-bold text-brand-500 uppercase tracking-widest">INSTRUCTOR PROFILE | 강사 소개</h2>
+                    <div class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 text-brand-500 text-sm font-semibold tracking-wide">
+                        <i class="fa-solid fa-award animate-pulse"></i>
+                        <span>기업교육 8년차 검증된 핵심 강사</span>
+                    </div>
+                    
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tight">
+                        하드웨어와 AI의 융합,<br/>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-indigo-500">실무 중심 교육</span>의 해답.
+                    </h1>
+                    
+                    <p class="text-lg sm:text-xl font-light leading-relaxed max-w-2xl" :class="darkMode ? 'text-slate-300' : 'text-slate-600'">
+                        성균관대학교 컴퓨터공학과 겸임교수 역임 및 대기업 맞춤형 출강.<br/>
+                        단순 이론에 그치지 않고, <span class="font-semibold text-brand-500">8년 동안 다듬어 온 실무 기반 커리큘럼</span>으로 현업의 과제를 즉시 해결하는 실습 중심의 명품 강의를 선사합니다.
+                    </p>
+
+                    <!-- Quick Credentials Badges -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4 text-left">
+                        <div class="p-4 rounded-xl border transition-all" :class="darkMode ? 'bg-slate-900/60 border-slate-850' : 'bg-white border-slate-200 shadow-sm'">
+                            <span class="text-xs text-brand-500 block font-semibold tracking-widest uppercase mb-1">소속</span>
+                            <span class="text-sm font-bold block">AIDL 연구소 소장</span>
+                            <span class="text-xs text-slate-500">프리랜서 강사</span>
+                        </div>
+                        <div class="p-4 rounded-xl border transition-all" :class="darkMode ? 'bg-slate-900/60 border-slate-850' : 'bg-white border-slate-200 shadow-sm'">
+                            <span class="text-xs text-brand-500 block font-semibold tracking-widest uppercase mb-1">경력</span>
+                            <span class="text-sm font-bold block">기업교육 8년차</span>
+                            <span class="text-xs text-slate-500">삼성전자/Hynix 등 출강</span>
+                        </div>
+                        <div class="p-4 rounded-xl border col-span-2 sm:col-span-1 transition-all" :class="darkMode ? 'bg-slate-900/60 border-slate-850' : 'bg-white border-slate-200 shadow-sm'">
+                            <span class="text-xs text-brand-500 block font-semibold tracking-widest uppercase mb-1">학력/학술</span>
+                            <span class="text-sm font-bold block">성균관대 겸임교수 (前)</span>
+                            <span class="text-xs text-slate-500">전자공학 석사</span>
+                        </div>
+                    </div>
+
+                    <!-- CTA Buttons -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+                        <button @click="showContactModal = true" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-brand-500 to-indigo-600 text-white font-bold hover:shadow-xl hover:shadow-brand-500/20 transition-all text-center">
+                            강의 문의 및 제안
+                        </button>
+                        <a href="#fields" class="w-full sm:w-auto px-8 py-4 rounded-xl font-bold border hover:bg-brand-500/5 transition-colors text-center"
+                           :class="darkMode ? 'border-slate-800 hover:border-slate-700' : 'border-slate-200 hover:border-slate-300'">
+                            강의 분야 살펴보기
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Hero Right: Dynamic Portrait Card with local backup image -->
+                <div class="lg:col-span-5 flex justify-center">
+                    <div class="relative group w-72 sm:w-80 lg:w-96">
+                        <!-- Neon Glowing Borders (Dark Mode only) -->
+                        <div x-show="darkMode" class="absolute -inset-1 rounded-3xl bg-gradient-to-tr from-brand-500 to-indigo-600 opacity-40 blur-lg group-hover:opacity-75 transition duration-500"></div>
+                        
+                        <!-- Core Card Wrapper -->
+                        <div class="relative rounded-2xl overflow-hidden border p-3 flex flex-col items-center" 
+                             :class="darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-xl'">
+                            
+                            <!-- Profile Picture (Fallback handling for local/placeholder rendering) -->
+                            <div class="w-full aspect-[4/5] rounded-xl overflow-hidden bg-slate-800 relative">
+                                <img src="https://i.ibb.co/Kj9gkWcd/profile.jpg" 
+                                     alt="정호채 강사 프로필 사진" 
+                                     class="w-full h-full object-cover object-center"
+                                     onerror="this.onerror=null; this.src='image_735e6a.png';">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-6">
+                                    <div>
+                                        <h3 class="text-2xl font-black text-white leading-tight">정 호 채 <span class="text-sm font-normal text-slate-300">Jeong Hochae</span></h3>
+                                        <p class="text-brand-500 text-sm font-medium mt-1">AIDL 연구소 소장 & 프리랜서 강사</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Career mini resume -->
+                            <div class="w-full mt-4 space-y-2.5 text-xs text-left px-2 py-1" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">
+                                <div class="flex items-start space-x-2">
+                                    <span class="text-brand-500 font-bold w-12 shrink-0">약력</span>
+                                    <span>(前) 성균관대학교 컴퓨터공학과 겸임교수</span>
+                                </div>
+                                <div class="flex items-start space-x-2">
+                                    <span class="text-brand-500 font-bold w-12 shrink-0">경력</span>
+                                    <span>(前) ㈜ 한국 AI 연구소 이사 / 국제대학교 강사</span>
+                                </div>
+                                <div class="flex items-start space-x-2">
+                                    <span class="text-brand-500 font-bold w-12 shrink-0">출강</span>
+                                    <span>삼성전자 반도체부문, SK하이닉스, 삼성전기 등 출강</span>
+                                </div>
+                                <div class="pt-2 border-t flex justify-between text-slate-500" :class="darkMode ? 'border-slate-850' : 'border-slate-100'">
+                                    <span><i class="fa-solid fa-phone mr-1"></i> 010-2077-6957</span>
+                                    <span @click="document.execCommand('copy'); toastMsg='이메일 주소가 복사되었습니다!'; showToast=true; setTimeout(() => showToast=false, 3000)" 
+                                          class="cursor-pointer hover:text-brand-500 transition-colors">
+                                        <i class="fa-solid fa-envelope mr-1"></i> hochae@aidl-lab.com
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Clients & Partners Section -->
+    <section class="py-12 border-y" :class="darkMode ? 'bg-slate-900/40 border-slate-900' : 'bg-slate-100/60 border-slate-200'">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-xs font-semibold uppercase tracking-widest text-slate-500 mb-8">이미 수많은 국내 최고의 기업 및 기관들의 임직원이 정호채 소장의 교육을 받았습니다</p>
+            <div class="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-75">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl font-extrabold tracking-tight">SAMSUNG</span>
+                    <span class="text-xs bg-brand-500/10 text-brand-500 px-2 py-0.5 rounded font-bold">반도체부문 / 삼성전기</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl font-extrabold tracking-tight text-red-500">SK hynix</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-lg font-bold">경기도경제과학진흥원</span>
+                    <span class="text-xs text-slate-500">(GBSA)</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-lg font-bold">대한상공회의소</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Strengths Section -->
+    <section id="strengths" class="py-24" :class="darkMode ? 'bg-slate-900/30' : 'bg-slate-100/40'">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                <h2 class="text-xs font-bold text-brand-500 uppercase tracking-widest">WHY CHOOSE ME</h2>
+                <h3 class="text-3xl sm:text-4xl font-extrabold tracking-tight">강사 정호채만의 2대 핵심 강점</h3>
+                <p class="text-lg" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">8년의 교육 노하우와 압도적인 실무 경험을 바탕으로, 이론을 뛰어넘는 최고의 실질 교육 솔루션을 제안합니다.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <!-- Strength 1 -->
+                <div class="p-8 rounded-2xl border flex flex-col items-center text-center transition-all duration-300 hover:shadow-lg"
+                     :class="darkMode ? 'bg-slate-900/50 border-slate-800 hover:bg-slate-900' : 'bg-white border-slate-200 hover:shadow-xl'">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-500 to-indigo-600 text-white flex items-center justify-center text-2xl mb-6 shadow-md shadow-brand-500/10">
+                        <i class="fa-solid fa-code-branch"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-4">1) 실무 중심 프로젝트 기반의 실습</h4>
+                    <p class="text-sm leading-relaxed" :class="darkMode ? 'text-slate-300' : 'text-slate-600'">
+                        어려운 수식과 가벼운 이론 설명만 늘어놓는 주입식 교육은 하지 않습니다. <br class="hidden sm:block">
+                        실제 업계에서 다루는 시나리오와 유사한 **프로젝트 기반 실습(PBL)**을 제공하여, 교육생들이 수업 이후 바로 자신의 업무에 개발 로직을 커스텀 적용할 수 있도록 코딩과 구조 설계를 실시간 지원합니다.
+                    </p>
+                </div>
+
+                <!-- Strength 2 -->
+                <div class="p-8 rounded-2xl border flex flex-col items-center text-center transition-all duration-300 hover:shadow-lg"
+                     :class="darkMode ? 'bg-slate-900/50 border-slate-800 hover:bg-slate-900' : 'bg-white border-slate-200 hover:shadow-xl'">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 to-brand-500 text-white flex items-center justify-center text-2xl mb-6 shadow-md shadow-indigo-500/10">
+                        <i class="fa-solid fa-building-shield"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-4">2) 대기업 강의를 통한 검증된 강의</h4>
+                    <p class="text-sm leading-relaxed" :class="darkMode ? 'text-slate-300' : 'text-slate-600'">
+                        삼성전자 반도체 부문, SK하이닉스, 삼성전기 등 최고의 기술진들을 대상으로 직무 고도화 강의를 다년간 진행해 왔습니다. <br class="hidden sm:block">
+                        **8년간 엄선된 정교한 교안과 깊이 있는 Q&A 소통**으로 주니어부터 시니어 연구원까지 모두 만족시키는 강력한 신뢰도를 보장합니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lecture Fields Section -->
+    <section id="fields" class="py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                <h2 class="text-xs font-bold text-brand-500 uppercase tracking-widest">LECTURE CATEGORIES</h2>
+                <h3 class="text-3xl sm:text-4xl font-extrabold tracking-tight">체계적인 하드웨어 및 소프트웨어 강의 분야</h3>
+                <p class="text-lg" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">언어 기초부터 최첨단 인공지능 온디바이스 개발까지, 독보적인 스펙트럼의 전문 커리큘럼을 제공합니다.</p>
+            </div>
+
+            <!-- Interactive Tab Controls -->
+            <div class="flex flex-wrap justify-center gap-2 mb-12">
+                <button @click="activeTab = 'all'" 
+                        class="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                        :class="activeTab === 'all' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : (darkMode ? 'bg-slate-900 hover:bg-slate-850' : 'bg-white border border-slate-200 hover:bg-slate-50')">
+                    <i class="fa-solid fa-list mr-2"></i>전체보기
+                </button>
+                <button @click="activeTab = 'ai'" 
+                        class="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                        :class="activeTab === 'ai' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : (darkMode ? 'bg-slate-900 hover:bg-slate-850' : 'bg-white border border-slate-200 hover:bg-slate-50')">
+                    <i class="fa-solid fa-brain mr-2"></i>AI / ML & On-Device AI
+                </button>
+                <button @click="activeTab = 'hdl'" 
+                        class="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                        :class="activeTab === 'hdl' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : (darkMode ? 'bg-slate-900 hover:bg-slate-850' : 'bg-white border border-slate-200 hover:bg-slate-50')">
+                    <i class="fa-solid fa-microchip mr-2"></i>HDL / RTL 검증
+                </button>
+                <button @click="activeTab = 'lang'" 
+                        class="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                        :class="activeTab === 'lang' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/20' : (darkMode ? 'bg-slate-900 hover:bg-slate-850' : 'bg-white border border-slate-200 hover:bg-slate-50')">
+                    <i class="fa-solid fa-code mr-2"></i>프로그래밍 언어
+                </button>
+            </div>
+
+            <!-- Fields Dynamic Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Card 1: AI/ML Foundations -->
+                <div x-show="activeTab === 'all' || activeTab === 'ai'" class="p-8 rounded-2xl border transition-all hover:-translate-y-1 duration-300"
+                     :class="darkMode ? 'bg-slate-900/50 border-slate-850 hover:border-brand-500/50' : 'bg-white border-slate-200 shadow-md hover:shadow-xl'">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center text-xl mb-6">
+                        <i class="fa-solid fa-network-wired"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">AI / ML 기초 및 응용</h4>
+                    <p class="text-sm leading-relaxed mb-6" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">Tensorflow, Keras, PyTorch 기반의 체계적인 머신러닝/딥러닝 알고리즘의 개념과 실습 위주 구현 교육.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs px-2.5 py-1 rounded-md" :class="darkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-700'">PyTorch</span>
+                        <span class="text-xs px-2.5 py-1 rounded-md" :class="darkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-700'">Tensorflow</span>
+                        <span class="text-xs px-2.5 py-1 rounded-md" :class="darkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-700'">Keras</span>
+                    </div>
+                </div>
+
+                <!-- Card 2: On-Device AI -->
+                <div x-show="activeTab === 'all' || activeTab === 'ai'" class="p-8 rounded-2xl border transition-all hover:-translate-y-1 duration-300"
+                     :class="darkMode ? 'bg-slate-900/50 border-slate-850 hover:border-brand-500/50' : 'bg-white border-slate-200 shadow-md hover:shadow-xl'">
+                    <div class="w-12 h-12 rounded-xl bg-brand-500/10 text-brand-500 flex items-center justify-center text-xl mb-6">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">On-Device AI 실무 실습</h4>
+                    <p class="text-sm leading-relaxed mb-6" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">경량 엣지 하드웨어를 활용한 실무 밀착형 인공지능 추론 최적화, 경량화 모델 배포 및 구동 실습 교육.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs px-2.5 py-1 rounded-md" :class="darkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-700'">Jetson</span>
+                        <span class="text-xs px-2.5 py-1 rounded-md" :class="darkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-700'">RasPi</span>
+                        <span class="text-xs px-2.5 py-1 rounded-md" :class="darkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-700'">KRIA (Xilinx)</span>
+                    </div>
+                </div>
+
+                <!-- Card 3: Verilog / HDL -->
+                <div x-show="activeTab === 'all' || activeTab === 'hdl'" class="p-8 rounded-2xl border transition-all hover:-translate-y-1 duration-300"
+                     :class="darkMode ? 'bg-slate-900/50 border-slate-850 hover:border-brand-500/50' : 'bg-white border-slate-200 shadow-md hover:shadow-xl'">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xl mb-6">
+                        <i class="fa-solid fa-microchip"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">HDL 기반 회로 설계</h4>
+                    <p class="text-sm leading-relaxed mb-6" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">반도체 설계를 위한 핵심 프로그래밍 언어인 Verilog 및 고성능 System Verilog 구조 정밀 분석 교육.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs px-2.5 py-1 rounded-md" :class="darkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-700'">Verilog</span>
+                        <span class="text-xs px-2.5 py-1 rounded-md" :class="darkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-700'">System Verilog</span>
+                    </div>
+                </div>
+
+                <!-- Card 4: UVM 검증 -->
+                <div x-show="activeTab === 'all' || activeTab === 'hdl'" class="p-8 rounded-2xl border transition-all hover:-translate-y-1 duration-300"
+                     :class="darkMode ? 'bg-slate-900/50 border-slate-850 hover:border-brand-500/50' : 'bg-white border-slate-200 shadow-md hover:shadow-xl'">
+                    <div class="w-12 h-12 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center text-xl mb-6">
+                        <i class="fa-solid fa-vial-circle-check"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">UVM 검증 방법론</h4>
+                    <p class="text-sm leading-relaxed mb-6" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">글로벌 표준 SoC 검증 프레임워크인 UVM(Universal Verification Methodology)을 깊이 있게 설계 및 실증.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs px-2.5 py-1 rounded-md" :class="darkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-700'">UVM</span>
+                        <span class="text-xs px-2.5 py-1 rounded-md" :class="darkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-700'">RTL 검증</span>
+                    </div>
+                </div>
+
+                <!-- Card 5: Core Programming -->
+                <div x-show="activeTab === 'all' || activeTab === 'lang'" class="p-8 rounded-2xl border transition-all hover:-translate-y-1 duration-300"
+                     :class="darkMode ? 'bg-slate-900/50 border-slate-850 hover:border-brand-500/50' : 'bg-white border-slate-200 shadow-md hover:shadow-xl'">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-xl mb-6">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">시스템 핵심 언어 (Python & C)</h4>
+                    <p class="text-sm leading-relaxed mb-6" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">엔지니어링 데이터 분석을 위한 Python, 그리고 초소형 기기 메모리 제어를 위한 C/C++ 기초 및 최적화.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs px-2.5 py-1 rounded-md" :class="darkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-700'">Python</span>
+                        <span class="text-xs px-2.5 py-1 rounded-md" :class="darkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-700'">C / C++</span>
+                    </div>
+                </div>
+
+                <!-- Card 6: Java OOP -->
+                <div x-show="activeTab === 'all' || activeTab === 'lang'" class="p-8 rounded-2xl border transition-all hover:-translate-y-1 duration-300"
+                     :class="darkMode ? 'bg-slate-900/50 border-slate-850 hover:border-brand-500/50' : 'bg-white border-slate-200 shadow-md hover:shadow-xl'">
+                    <div class="w-12 h-12 rounded-xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center text-xl mb-6">
+                        <i class="fa-brands fa-java"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">객체 지향 프로그래밍 Java</h4>
+                    <p class="text-sm leading-relaxed mb-6" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">탄탄한 인프라와 견고한 비즈니스 애플리케이션 설계를 위한 고성능 객체 지향 프로그래밍 Java 및 OOP 패턴.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs px-2.5 py-1 rounded-md" :class="darkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-700'">Java</span>
+                        <span class="text-xs px-2.5 py-1 rounded-md" :class="darkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-700'">OOP</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Representative Projects Section -->
+    <section id="projects" class="py-24" :class="darkMode ? 'bg-slate-900/20' : 'bg-white'">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                <h2 class="text-xs font-bold text-brand-500 uppercase tracking-widest">INDUSTRY PROJECTS</h2>
+                <h3 class="text-3xl sm:text-4xl font-extrabold tracking-tight">현업 실무 포트폴리오</h3>
+                <p class="text-lg" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">정호채 소장이 리드하고 실제 기획·설계해 온 풍부한 엔지니어링 실무 역량입니다.</p>
+            </div>
+
+            <!-- Project Card Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Project 1 -->
+                <div class="group rounded-2xl border overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1"
+                     :class="darkMode ? 'bg-slate-900 border-slate-850 hover:border-slate-800' : 'bg-white border-slate-200 shadow-sm hover:shadow-md'">
+                    <div class="p-6">
+                        <div class="text-xs font-bold uppercase tracking-widest text-brand-500 mb-2">Machine Learning / Computer Vision</div>
+                        <h4 class="text-lg font-bold mb-3 group-hover:text-brand-500 transition-colors">교통상황 인식 시스템 구축</h4>
+                        <p class="text-sm leading-relaxed" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">Object Detection & Tracking 기술을 기반으로 도시 도로 교통상황을 정밀 인식하고 분석하는 실시간 지능형 관제 시스템.</p>
+                    </div>
+                    <div class="p-6 border-t flex flex-wrap gap-1.5" :class="darkMode ? 'border-slate-850 bg-slate-950/40' : 'border-slate-100 bg-slate-50/50'">
+                        <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded bg-slate-800 text-slate-300">Object Detection</span>
+                        <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded bg-slate-800 text-slate-300">Tracking</span>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="group rounded-2xl border overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1"
+                     :class="darkMode ? 'bg-slate-900 border-slate-850 hover:border-slate-800' : 'bg-white border-slate-200 shadow-sm hover:shadow-md'">
+                    <div class="p-6">
+                        <div class="text-xs font-bold uppercase tracking-widest text-brand-500 mb-2">Cloud & Distributed Video</div>
+                        <h4 class="text-lg font-bold mb-3 group-hover:text-brand-500 transition-colors">분산 비디오 스트리밍 시스템</h4>
+                        <p class="text-sm leading-relaxed" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">NginX 미디어 중계 서버 설계, AWS 고가용성 인프라 구성 및 엣지 장치(RasPi) 간 분산 스트리밍 최적화 설계.</p>
+                    </div>
+                    <div class="p-6 border-t flex flex-wrap gap-1.5" :class="darkMode ? 'border-slate-850 bg-slate-950/40' : 'border-slate-100 bg-slate-50/50'">
+                        <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded bg-slate-800 text-slate-300">NginX</span>
+                        <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded bg-slate-800 text-slate-300">AWS</span>
+                        <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded bg-slate-800 text-slate-300">RasPi</span>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="group rounded-2xl border overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1"
+                     :class="darkMode ? 'bg-slate-900 border-slate-850 hover:border-slate-800' : 'bg-white border-slate-200 shadow-sm hover:shadow-md'">
+                    <div class="p-6">
+                        <div class="text-xs font-bold uppercase tracking-widest text-brand-500 mb-2">Smart Factory / Machine Vision</div>
+                        <h4 class="text-lg font-bold mb-3 group-hover:text-brand-500 transition-colors">머신비전 기반 생산 검수 시스템</h4>
+                        <p class="text-sm leading-relaxed" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">OpenCV 핵심 프레임워크를 기반으로, 산업 생산라인 제품의 무결성을 초정밀 검수하고 모니터링하는 검사 지능 시스템 구축.</p>
+                    </div>
+                    <div class="p-6 border-t flex flex-wrap gap-1.5" :class="darkMode ? 'border-slate-850 bg-slate-950/40' : 'border-slate-100 bg-slate-50/50'">
+                        <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded bg-slate-800 text-slate-300">OpenCV</span>
+                        <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded bg-slate-800 text-slate-300">Inspection</span>
+                    </div>
+                </div>
+
+                <!-- Project 4 -->
+                <div class="group rounded-2xl border overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1"
+                     :class="darkMode ? 'bg-slate-900 border-slate-850 hover:border-slate-800' : 'bg-white border-slate-200 shadow-sm hover:shadow-md'">
+                    <div class="p-6">
+                        <div class="text-xs font-bold uppercase tracking-widest text-brand-500 mb-2">Display Processors</div>
+                        <h4 class="text-lg font-bold mb-3 group-hover:text-brand-500 transition-colors">Pixelworks사 이미지 프로세서 제어</h4>
+                        <p class="text-sm leading-relaxed" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">고해상도 디스플레이 구동을 위한 전용 이미지 스케일링 및 비디오 인터페이스 화질 튜닝 펌웨어 응용 레이어 설계.</p>
+                    </div>
+                    <div class="p-6 border-t flex flex-wrap gap-1.5" :class="darkMode ? 'border-slate-850 bg-slate-950/40' : 'border-slate-100 bg-slate-50/50'">
+                        <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded bg-slate-800 text-slate-300">Pixelworks</span>
+                        <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded bg-slate-800 text-slate-300">Image Processing</span>
+                    </div>
+                </div>
+
+                <!-- Project 5 -->
+                <div class="group rounded-2xl border overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1"
+                     :class="darkMode ? 'bg-slate-900 border-slate-850 hover:border-slate-800' : 'bg-white border-slate-200 shadow-sm hover:shadow-md'">
+                    <div class="p-6">
+                        <div class="text-xs font-bold uppercase tracking-widest text-brand-500 mb-2">Hardware Design / SoC</div>
+                        <h4 class="text-lg font-bold mb-3 group-hover:text-brand-500 transition-colors">ADSL CO 장비 및 ATM Cell Muxer</h4>
+                        <p class="text-sm leading-relaxed" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">Xilinx Spartan 디바이스 기반의 실시간 ATM Cell 멀티플렉서 하드웨어 회로 로직 설계 및 장비 튜닝.</p>
+                    </div>
+                    <div class="p-6 border-t flex flex-wrap gap-1.5" :class="darkMode ? 'border-slate-850 bg-slate-950/40' : 'border-slate-100 bg-slate-50/50'">
+                        <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded bg-slate-800 text-slate-300">Xilinx Spartan</span>
+                        <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded bg-slate-800 text-slate-300">ATM Muxer</span>
+                    </div>
+                </div>
+
+                <!-- Project 6 -->
+                <div class="group rounded-2xl border overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1"
+                     :class="darkMode ? 'bg-slate-900 border-slate-850 hover:border-slate-800' : 'bg-white border-slate-200 shadow-sm hover:shadow-md'">
+                    <div class="p-6">
+                        <div class="text-xs font-bold uppercase tracking-widest text-brand-500 mb-2">DSP & Audio Systems</div>
+                        <h4 class="text-lg font-bold mb-3 group-hover:text-brand-500 transition-colors">사운드필드 제너레이터 응용 설계</h4>
+                        <p class="text-sm leading-relaxed" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">Yamaha사 DSP 프로세싱 아키텍처를 기반으로 한 하이파이 다차원 사운드 필드 및 음장 생성 임베디드 알고리즘 이식.</p>
+                    </div>
+                    <div class="p-6 border-t flex flex-wrap gap-1.5" :class="darkMode ? 'border-slate-850 bg-slate-950/40' : 'border-slate-100 bg-slate-50/50'">
+                        <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded bg-slate-800 text-slate-300">Yamaha DSP</span>
+                        <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded bg-slate-800 text-slate-300">Embedded Audio</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Collaboration Fields Section -->
+    <section id="collaboration" class="py-24" :class="darkMode ? 'bg-slate-900/40' : 'bg-slate-100/40'">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                <h2 class="text-xs font-bold text-brand-500 uppercase tracking-widest">COLLABORATION PROPOSAL</h2>
+                <h3 class="text-3xl sm:text-4xl font-extrabold tracking-tight">강의 협업을 희망하는 전문 분야</h3>
+                <p class="text-lg" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">AIDL 연구소는 아래 핵심 비즈니스 도메인의 실무 지식 연계 교육 및 기술 협업 제안을 환영합니다.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                
+                <!-- Collab Item 1: AI를 활용한 HW 설계 및 검증 -->
+                <div class="p-8 rounded-2xl border flex items-start space-x-6" 
+                     :class="darkMode ? 'bg-slate-950/80 border-slate-850' : 'bg-white border-slate-200 shadow-sm'">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500 to-blue-600 text-white flex items-center justify-center text-2xl shrink-0 shadow-lg shadow-brand-500/10">
+                        <i class="fa-solid fa-microchip"></i>
+                    </div>
+                    <div class="space-y-3">
+                        <h4 class="text-xl font-bold tracking-tight">AI를 활용한 HW 설계 및 검증</h4>
+                        <p class="text-sm leading-relaxed" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">
+                            전통적인 하드웨어 설계 기법에 인공지능 방법론을 결합하여, **Verilog/SystemVerilog 코드 가속 및 회로 구조 자동 검증(RTL Validation Optimization)**을 실용화하는 교육·공동 프로젝트를 제안합니다.
+                        </p>
+                        <span class="inline-flex items-center text-xs font-semibold text-brand-500">
+                            관련 키워드: AI, RTL 검증, UVM, Verilog Automation <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Collab Item 2: On-Device AI 기반 분산 서비스 -->
+                <div class="p-8 rounded-2xl border flex items-start space-x-6" 
+                     :class="darkMode ? 'bg-slate-950/80 border-slate-850' : 'bg-white border-slate-200 shadow-sm'">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-2xl shrink-0 shadow-lg shadow-indigo-500/10">
+                        <i class="fa-solid fa-server"></i>
+                    </div>
+                    <div class="space-y-3">
+                        <h4 class="text-xl font-bold tracking-tight">On-Device AI 기반 분산 서비스</h4>
+                        <p class="text-sm leading-relaxed" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">
+                            고가의 클라우드 인프라가 아닌, **Jetson, Raspberry Pi 등 엣지 기기들의 분산 네트워킹과 AI 모델 최적화 배포**를 활용한 스마트 리테일, 산업 인스펙션 및 엣지 분산 서비스 아키텍처 교육 모델을 제공합니다.
+                        </p>
+                        <span class="inline-flex items-center text-xs font-semibold text-brand-500">
+                            관련 키워드: On-Device AI, 분산 컴퓨팅, NginX, 엣지 클라우드 <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="reviews" class="py-24 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                <h2 class="text-xs font-bold text-brand-500 uppercase tracking-widest">FEEDBACK & REVIEWS</h2>
+                <h3 class="text-3xl sm:text-4xl font-extrabold tracking-tight">수강생 및 교육 담당자 생생 수강 후기</h3>
+                <p class="text-lg" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">실제 현장 만족도와 교육 만족도 조사에서 극찬을 받은 후기입니다.</p>
+            </div>
+
+            <!-- Review Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Review Card 1 -->
+                <div class="p-8 rounded-2xl border flex flex-col justify-between transition-all"
+                     :class="darkMode ? 'bg-slate-900/60 border-slate-850' : 'bg-white border-slate-200 shadow-md'">
+                    <div>
+                        <div class="flex items-center space-x-1 text-yellow-500 mb-4">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-sm leading-relaxed italic mb-6" :class="darkMode ? 'text-slate-300' : 'text-slate-700'">
+                            "Verilog나 System Verilog 설계는 교재만 봐서는 이해하기 매우 어려운 구조였는데, 소장님께서 현업 칩셋 개발 관점의 하드웨어 타이밍 다이어그램과 연관지어 직관적으로 가르쳐주셨습니다. 실무 가이드로 삼고 있습니다."
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-3 border-t pt-4" :class="darkMode ? 'border-slate-850' : 'border-slate-100'">
+                        <div class="w-10 h-10 rounded-full bg-brand-500/10 text-brand-500 flex items-center justify-center font-bold text-sm">
+                            S
+                        </div>
+                        <div>
+                            <span class="text-sm font-bold block">이*석 선임 연구원</span>
+                            <span class="text-[11px] text-slate-500">삼성전자 반도체 메모리 사업부</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Card 2 -->
+                <div class="p-8 rounded-2xl border flex flex-col justify-between transition-all"
+                     :class="darkMode ? 'bg-slate-900/60 border-slate-850' : 'bg-white border-slate-200 shadow-md'">
+                    <div>
+                        <div class="flex items-center space-x-1 text-yellow-500 mb-4">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-sm leading-relaxed italic mb-6" :class="darkMode ? 'text-slate-300' : 'text-slate-700'">
+                            "On-Device AI 강의를 수강했습니다. 고스펙 GPU 서버가 아닌 라즈베리 파이와 제트슨 나노 환경에서 AI 모델이 정상 동작하고 정밀 제어가 구현되는 모습을 겪으며, 프로젝트 구현 속도와 자신감이 배로 증가했습니다."
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-3 border-t pt-4" :class="darkMode ? 'border-slate-850' : 'border-slate-100'">
+                        <div class="w-10 h-10 rounded-full bg-brand-500/10 text-brand-500 flex items-center justify-center font-bold text-sm">
+                            K
+                        </div>
+                        <div>
+                            <span class="text-sm font-bold block">김*민 하드웨어 엔지니어</span>
+                            <span class="text-[11px] text-slate-500">지능형 엣지 솔루션 스타트업</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Card 3 -->
+                <div class="p-8 rounded-2xl border flex flex-col justify-between transition-all"
+                     :class="darkMode ? 'bg-slate-900/60 border-slate-850' : 'bg-white border-slate-200 shadow-md'">
+                    <div>
+                        <div class="flex items-center space-x-1 text-yellow-500 mb-4">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-sm leading-relaxed italic mb-6" :class="darkMode ? 'text-slate-300' : 'text-slate-700'">
+                            "기업 맞춤형 커리큘럼을 먼저 제안해 주시고 임직원 수준에 맞춰 아주 기초적인 PyTorch 코딩부터 엣지 최적화까지 로드맵을 선사해 주셨습니다. 올해 하반기 심화 교육도 이어서 의뢰드릴 생각입니다."
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-3 border-t pt-4" :class="darkMode ? 'border-slate-850' : 'border-slate-100'">
+                        <div class="w-10 h-10 rounded-full bg-brand-500/10 text-brand-500 flex items-center justify-center font-bold text-sm">
+                            H
+                        </div>
+                        <div>
+                            <span class="text-sm font-bold block">조*우 인사혁신부 차장</span>
+                            <span class="text-[11px] text-slate-500">SK하이닉스 기술 교육 기획 담당</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="py-12 border-t" :class="darkMode ? 'bg-slate-950 border-slate-900' : 'bg-slate-100 border-slate-200'">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-8 mb-8">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white">
+                        <i class="fa-solid fa-microchip"></i>
+                    </div>
+                    <div>
+                        <span class="text-lg font-bold tracking-tight block leading-none" :class="darkMode ? 'text-white' : 'text-slate-900'">정호채</span>
+                        <span class="text-xs font-medium tracking-widest text-brand-500 uppercase">AIDL Lab (AIDL 연구소)</span>
+                    </div>
+                </div>
+                <div class="flex flex-wrap justify-center gap-6 text-sm" :class="darkMode ? 'text-slate-400' : 'text-slate-600'">
+                    <a href="#about" class="hover:text-brand-500">소개</a>
+                    <a href="#strengths" class="hover:text-brand-500">핵심 강점</a>
+                    <a href="#fields" class="hover:text-brand-500">강의 분야</a>
+                    <a href="#projects" class="hover:text-brand-500">프로젝트 실무</a>
+                    <a href="#collaboration" class="hover:text-brand-500">협업 제안</a>
+                </div>
+            </div>
+            
+            <div class="border-t pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs" :class="darkMode ? 'border-slate-900 text-slate-400' : 'border-slate-200 text-slate-500'">
+                <div class="space-y-1 text-center md:text-left">
+                    <p>대표자: 정호채 | 연구소명: AIDL 연구소 (AIDL Lab) | 프리랜서 강사 활동 중</p>
+                    <p>연락처: 010-2077-6957 | 이메일: hochae@aidl-lab.com</p>
+                    <p class="text-[10px] text-slate-600 dark:text-slate-500">이 사이트는 "강사소개_aidl_mldl_2412.pptx"의 원문 데이터 구조를 충실히 반영하여 제작되었습니다.</p>
+                </div>
+                <div>
+                    <p>&copy; 2026 AIDL Lab. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Quick Call To Action Button -->
+    <div class="fixed bottom-6 right-6 z-40 flex flex-col space-y-3">
+        <button @click="showContactModal = true" class="flex items-center space-x-2 bg-gradient-to-r from-brand-500 to-indigo-600 text-white px-5 py-3.5 rounded-full shadow-2xl hover:scale-105 transition-transform font-bold text-sm">
+            <i class="fa-solid fa-paper-plane animate-bounce"></i>
+            <span>강의 의뢰</span>
+        </button>
+    </div>
+
+    <!-- Interactive Lecture Request Modal -->
+    <div x-show="showContactModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95">
+        
+        <div class="relative w-full max-w-lg rounded-2xl border p-6 sm:p-8 shadow-2xl transition-all animate-in fade-in"
+             @click.away="showContactModal = false"
+             :class="darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'">
+            
+            <button @click="showContactModal = false" class="absolute top-4 right-4 text-slate-400 hover:text-brand-500 transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-xl sm:text-2xl font-bold tracking-tight">강의 의뢰 및 제안하기</h3>
+                    <p class="text-xs sm:text-sm mt-1" :class="darkMode ? 'text-slate-450' : 'text-slate-600'">기관/기업의 비즈니스 도메인 맞춤 전문 교육을 바로 설계해 드립니다.</p>
+                </div>
+
+                <form @submit.prevent="showContactModal = false; toastMsg='정호채 소장님께 소중한 강의 제안서가 안전하게 전송되었습니다. 기재해주신 연락처로 24시간 이내에 직접 상세 답변 드리겠습니다!'; showToast = true; setTimeout(() => showToast = false, 6000)" 
+                      class="space-y-4 text-left">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 uppercase tracking-wide">의뢰 기관 / 기업명</label>
+                        <input required type="text" placeholder="예: (주)에이아이 반도체" 
+                               class="w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                               :class="darkMode ? 'bg-slate-950 border-slate-880 text-slate-100' : 'bg-slate-50 border-slate-200 text-slate-900'">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold mb-1 uppercase tracking-wide">성함 (담당자)</label>
+                            <input required type="text" placeholder="예: 홍길동 팀장" 
+                                   class="w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                                   :class="darkMode ? 'bg-slate-950 border-slate-880 text-slate-100' : 'bg-slate-50 border-slate-200 text-slate-900'">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold mb-1 uppercase tracking-wide">연락처</label>
+                            <input required type="tel" placeholder="예: 010-1234-5678" 
+                                   class="w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                                   :class="darkMode ? 'bg-slate-950 border-slate-880 text-slate-100' : 'bg-slate-50 border-slate-200 text-slate-900'">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 uppercase tracking-wide">대표 문의 이메일</label>
+                        <input required type="email" placeholder="example@company.com" 
+                               class="w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                               :class="darkMode ? 'bg-slate-950 border-slate-880 text-slate-100' : 'bg-slate-50 border-slate-200 text-slate-900'">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 uppercase tracking-wide">의뢰 분야 선택</label>
+                        <select class="w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                                :class="darkMode ? 'bg-slate-950 border-slate-880 text-slate-100' : 'bg-slate-50 border-slate-200 text-slate-900'">
+                            <option>AI / Machine Learning (기초 및 응용)</option>
+                            <option>On-Device AI (Jetson / RasPi / KRIA)</option>
+                            <option>Verilog / System Verilog / UVM 검증</option>
+                            <option>Python / C언어 / Java 프로그래밍</option>
+                            <option>AI 활용 HW 설계 및 검증 (협업/자문)</option>
+                            <option>On-Device AI 기반 분산 서비스 (협업/자문)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 uppercase tracking-wide">문의 및 제안 내용</label>
+                        <textarea required rows="4" placeholder="예: 대략적인 수강 인원, 일정 및 타겟하는 교육 목표를 간략히 적어주세요." 
+                                  class="w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                                  :class="darkMode ? 'bg-slate-950 border-slate-880 text-slate-100' : 'bg-slate-50 border-slate-200 text-slate-900'"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 mt-2 rounded-xl bg-gradient-to-r from-brand-500 to-indigo-600 text-white font-bold hover:opacity-95 transition-opacity">
+                        송신 완료
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Premium Toast Alert System -->
+    <div x-show="showToast" x-cloak class="fixed bottom-6 left-6 right-6 sm:left-auto sm:w-96 z-50 p-4 rounded-xl border shadow-2xl flex items-start space-x-3 bg-slate-900 border-slate-800 text-white animate-bounce"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-2">
+        <div class="w-8 h-8 rounded-full bg-brand-500/10 text-brand-500 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div class="flex-1">
+            <h4 class="text-sm font-bold">안내 알림</h4>
+            <p class="text-xs text-slate-300 mt-1 leading-relaxed" x-text="toastMsg"></p>
+        </div>
+        <button @click="showToast = false" class="text-slate-400 hover:text-slate-200">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+</body>
+</html>
