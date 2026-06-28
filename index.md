@@ -2,7 +2,7 @@
 
 
 
-## [소개](./code_artifact.html)
+## [소개](./code_artifact.html): built by copilot and gemini
 
 ## [CodeXpert](https://codexpert.co.kr/)
 
