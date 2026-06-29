@@ -14,7 +14,7 @@
 ---
 ## 최종 결과물
 
-### `KCCI_ OnDevice_1기 _최종결과물(1팀)` folder에 아래 내용을 제출
+### `KCCI_OnDevice_1기_최종결과물(1팀)` folder에 아래 내용을 제출
 
 ### 1. 결과 보고서
 * KCCI_OnDevice_1기_결과보고서(1팀).ppt
