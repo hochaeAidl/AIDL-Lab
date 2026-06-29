@@ -15,3 +15,5 @@
 
 ---
 ## [KCCI On-Device AI 1기](https://github.com/hochaeAidl/KCCI-Ondevice-AI-1st)
+
+## [KCCI Robot 3기](https://github.com/hochaeAidl/KCCI_AI_Robot_3)
