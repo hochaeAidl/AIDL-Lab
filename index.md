@@ -7,3 +7,5 @@
 ## [CodeXpert](https://codexpert.co.kr/)
 
 ## [발표 순서](https://hochaeaidl.github.io/ladder-game/)
+
+## [발표날 일정](./schedule.md)
