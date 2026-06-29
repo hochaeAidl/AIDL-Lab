@@ -12,3 +12,6 @@
 ![fig](https://lh3.googleusercontent.com/u/0/d/10V4913-dUHNLp1HtY875lQpImgnNPPSM)
 
 ## [발표날 일정](./schedule.md)
+
+---
+## [KCCI On-Device AI 1기](https://github.com/hochaeAidl/KCCI-Ondevice-AI-1st)
